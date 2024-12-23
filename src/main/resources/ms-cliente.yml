@@ -1,0 +1,203 @@
+openapi: 3.0.3
+info:
+  title: Client service
+  description: API for management clients.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+paths:
+  /v1/clients:
+    get:
+      summary: List all clients
+      operationId: findAll
+      responses:
+        '200':
+          description: Client list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClientResponse'
+    post:
+      summary: Insert client
+      operationId: insert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientRequest'
+      responses: 
+        '201':
+          description: Client created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/clients/{id_client}:
+    get:
+      summary: Get client by Id
+      operationId: getClientById
+      parameters:
+        - name: id_client
+          in: path
+          required: true
+          description: Id client
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '404':
+          description: Not found Client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete client by Id
+      operationId: deleteClientById
+      parameters:
+        - name: id_client
+          in: path
+          required: true
+          description: Id client
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Client deleted
+        '404':
+          description: Not Found Client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update client
+      operationId: update
+      parameters:
+        - name: id_client
+          in: path
+          required: true
+          description: Id client
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientRequest'
+      responses:
+        '200':
+          description: Client updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '400':
+          description: Request invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas: 
+    TypeDocument:
+      type: string
+      enum:
+        - DNI
+        - RUC
+    TypeClient:
+      type: string
+      enum:
+        - PERSONAL
+        - BUSINESS
+    Client:
+      type: object
+      properties:
+        _id:
+          type: string
+        type:
+          $ref: '#/components/schemas/TypeClient'
+        name:
+          type: string
+        typeDocument:
+          $ref: '#/components/schemas/TypeDocument'
+        nroDocument:
+          type: string
+        status:
+          type: boolean
+    ClientResponse:
+      type: object
+      properties:
+        _id:
+          type: string
+        type:
+          $ref: '#/components/schemas/TypeClient'
+        name:
+          type: string
+        typeDocument:
+          $ref: '#/components/schemas/TypeDocument'
+        nroDocument:
+          type: string
+        status:
+          type: boolean
+    ClientRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/TypeClient'
+        name:
+          type: string
+        typeDocument:
+          $ref: '#/components/schemas/TypeDocument'
+        nroDocument:
+          type: string
+        status:
+          type: boolean
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
