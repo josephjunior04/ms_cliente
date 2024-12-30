@@ -1,17 +1,18 @@
 package com.ms_cliente.ms_cliente.controller;
 
-import javax.validation.Valid;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 
-import com.ms_cliente.api.V1Api;
+import com.ms_cliente.controller.V1Api;
 import com.ms_cliente.model.ClientRequest;
 import com.ms_cliente.model.ClientResponse;
 import com.ms_cliente.ms_cliente.service.ClientService;
+import com.ms_cliente.ms_cliente.utils.HandleResponseUtil;
 
+import jakarta.validation.Valid;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,51 +21,74 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ClientController implements V1Api {
 
-    private final ClientService clientService;
+    /**
+     * @service cliente service
+     */
+    @NonNull
+    private ClientService clientService;
 
+    /**
+     * @return Mono Response Entity with status and Flux Client response
+     */
     @Override
-    public Mono<ResponseEntity<Flux<ClientResponse>>> findAll(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(clientService.findAll()));
+    public Mono<ResponseEntity<Flux<ClientResponse>>> findAll(
+            final ServerWebExchange exchange) {
+        return HandleResponseUtil
+                .handleResponse(HttpStatus.OK, clientService.findAll());
     }
 
+    /**
+     * @return Mono Response Entity with status and Client response
+     * @param clientRequest Request for insert client
+     */
     @Override
-    public Mono<ResponseEntity<ClientResponse>> insert(@Valid Mono<ClientRequest> clientRequest,
-            ServerWebExchange exchange) {
+    public Mono<ResponseEntity<ClientResponse>> insert(
+        @Valid final Mono<ClientRequest> clientRequest,
+            final ServerWebExchange exchange) {
         return clientRequest
-                .flatMap(request -> clientService.insert(request)
-                        .map(clienteResponse -> {
-                            return ResponseEntity
-                                    .status(HttpStatus.CREATED)
-                                    .body(clienteResponse);
-                        }));
+                .flatMap(request ->
+                HandleResponseUtil.handleResponse(HttpStatus.CREATED,
+                        clientService.insert(request)));
     }
 
+    /**
+     * @return Mono Response Entity with status and Client response
+     * @param client Request for insert client
+     * @param idClient Current id of client to update
+     */
     @Override
-    public Mono<ResponseEntity<ClientResponse>> update(String idClient, @Valid Mono<ClientRequest> cliente,
-            ServerWebExchange exchange) {
-        return cliente
-                .flatMap(request -> clientService.update(idClient, request)
-                        .map(clientResponse -> {
-                            return ResponseEntity
-                                    .status(HttpStatus.CREATED)
-                                    .body(clientResponse);
-                        }));
+    public Mono<ResponseEntity<ClientResponse>> update(
+        final String idClient,
+            @Valid final Mono<ClientRequest> client,
+            final ServerWebExchange exchange) {
+        return client
+                .flatMap(request ->
+                HandleResponseUtil.handleResponse(HttpStatus.OK,
+                        clientService.update(idClient, request)));
     }
 
+    /**
+     * @return Mono Response Entity with status
+     * @param idClient Current id of client to delete
+     */
     @Override
-    public Mono<ResponseEntity<Void>> deleteClientById(String idClient, ServerWebExchange exchange) {
-        return clientService.deleteById(idClient)
-                .then(Mono.just(ResponseEntity.noContent().build()));
+    public Mono<ResponseEntity<Void>> deleteClientById(
+        final String idClient, final ServerWebExchange exchange) {
+        return HandleResponseUtil
+        .handleResponse(
+            HttpStatus.NO_CONTENT, clientService.deleteById(idClient));
     }
 
+    /**
+     * @return Mono Response Entity with status
+     * @param idClient Current id of client to delete
+     */
     @Override
-    public Mono<ResponseEntity<ClientResponse>> getClientById(String idCliente, ServerWebExchange exchange) {
-        return clientService.findById(idCliente)
-                .map(clientResponse -> {
-                    return ResponseEntity
-                            .status(HttpStatus.OK)
-                            .body(clientResponse);
-                });
+    public Mono<ResponseEntity<ClientResponse>> getClientById(
+        final String idClient,
+            final ServerWebExchange exchange) {
+        return HandleResponseUtil
+        .handleResponse(HttpStatus.OK, clientService.findById(idClient));
     }
 
 }

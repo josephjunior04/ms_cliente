@@ -74,7 +74,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '500':
-          description: Error interno del servidor
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -151,6 +151,11 @@ components:
       enum:
         - PERSONAL
         - BUSINESS
+    SubTypeClient:
+      type: string
+      enum:
+        - VIP
+        - PYME
     Client:
       type: object
       properties:
@@ -158,6 +163,8 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/TypeClient'
+        subType:
+          $ref: '#/components/schemas/SubTypeClient'
         name:
           type: string
         typeDocument:
@@ -173,6 +180,8 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/TypeClient'
+        subType:
+          $ref: '#/components/schemas/SubTypeClient'
         name:
           type: string
         typeDocument:
@@ -186,6 +195,8 @@ components:
       properties:
         type:
           $ref: '#/components/schemas/TypeClient'
+        subType:
+          $ref: '#/components/schemas/SubTypeClient'
         name:
           type: string
         typeDocument:
@@ -194,6 +205,9 @@ components:
           type: string
         status:
           type: boolean
+      required:
+        - type
+        - name
     ErrorResponse:
       type: object
       properties:
