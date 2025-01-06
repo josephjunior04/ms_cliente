@@ -12,7 +12,6 @@ import com.ms_cliente.ms_cliente.service.ClientService;
 import com.ms_cliente.ms_cliente.utils.HandleResponseUtil;
 
 import jakarta.validation.Valid;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,8 +23,7 @@ public class ClientController implements V1Api {
     /**
      * @service cliente service
      */
-    @NonNull
-    private ClientService clientService;
+    private final ClientService clientService;
 
     /**
      * @return Mono Response Entity with status and Flux Client response
@@ -84,11 +82,8 @@ public class ClientController implements V1Api {
      * @param idClient Current id of client to delete
      */
     @Override
-    public Mono<ResponseEntity<ClientResponse>> getClientById(
-        final String idClient,
-            final ServerWebExchange exchange) {
+    public Mono<ResponseEntity<ClientResponse>> getClientById(final String idClient, final ServerWebExchange exchange) {
         return HandleResponseUtil
         .handleResponse(HttpStatus.OK, clientService.findById(idClient));
     }
-
 }

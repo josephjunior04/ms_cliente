@@ -103,6 +103,20 @@
 			<artifactId>openapi-generator-cli</artifactId>
 			<version>6.0.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+			<version>4.2.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+			<version>4.2.0</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
