@@ -1,0 +1,14 @@
+services:
+  mongodb-ms-client:
+    image: mongo:latest
+    container_name: "mongodb-ms-client"
+    ports:
+      - 27017:27017
+
+  bootcamp-ms-client:
+    image: bootcamp-ms-client-image:latest
+    container_name: bootcamp-ms-client
+    ports:
+      - 9090:8080
+    links:
+      - mongodb-ms-client
