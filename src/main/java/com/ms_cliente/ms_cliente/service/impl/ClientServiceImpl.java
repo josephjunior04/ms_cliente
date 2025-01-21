@@ -7,7 +7,10 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import com.ms_cliente.model.BalanceResponse;
 import com.ms_cliente.model.Client;
 import com.ms_cliente.model.ClientRequest;
 import com.ms_cliente.model.ClientResponse;
@@ -27,11 +30,10 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(ClientService.class);
-        /**
-         * @repository repository
-         */
         private final ClientRepository clientRepository;
+        private final WebClient webClient;
+
+        private static final Logger LOGGER = LoggerFactory.getLogger(ClientService.class);
 
         /**
          * @return response
@@ -56,8 +58,8 @@ public class ClientServiceImpl implements ClientService {
 
         private Mono<Client> handleClientUpdate(final Client existingClient, final ClientRequest clientRequest) {
                 return validateRules(clientRequest)
-                        .then(Mono.just(existingClient))
-                        .flatMap(client -> this.updateClient(client, clientRequest));
+                                .then(Mono.just(existingClient))
+                                .flatMap(client -> this.updateClient(client, clientRequest));
         }
 
         private Mono<Void> validateClient(final ClientRequest clientRequest) {
@@ -185,5 +187,33 @@ public class ClientServiceImpl implements ClientService {
                 LOGGER.info("Return all clients");
                 return clientRepository.findAll()
                                 .map(this::toResponseFromEntity);
+        }
+
+        /**
+         * @return Flux balances of products
+         */
+        @Override
+        public Flux<BalanceResponse> getAllProducts(final String id) {
+                Flux<BalanceResponse> bankAccountsBalances = webClient.get()
+                                .uri("http://bank-account-service/v1/accounts/{clientId}/getBalance", id)
+                                .retrieve()
+                                .bodyToFlux(BalanceResponse.class)
+                                .onErrorResume(WebClientResponseException.class, ex -> {
+                                        LOGGER.error("Error fetching bank account balances for clientId {}: {}", id,
+                                                        ex.getMessage());
+                                        return Flux.empty();
+                                });
+
+                Flux<BalanceResponse> creditBalances = webClient.get()
+                                .uri("http://credit-service/v1/credits/{clientId}/getBalance", id)
+                                .retrieve()
+                                .bodyToFlux(BalanceResponse.class)
+                                .onErrorResume(WebClientResponseException.class, ex -> {
+                                        LOGGER.error("Error fetching credit balances for clientId {}: {}", id,
+                                                        ex.getMessage());
+                                        return Flux.empty();
+                                });
+
+                return Flux.merge(bankAccountsBalances, creditBalances);
         }
 }

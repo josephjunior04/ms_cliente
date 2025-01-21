@@ -1,5 +1,6 @@
 package com.ms_cliente.ms_cliente.service;
 
+import com.ms_cliente.model.BalanceResponse;
 import com.ms_cliente.model.ClientRequest;
 import com.ms_cliente.model.ClientResponse;
 
@@ -36,4 +37,10 @@ public interface ClientService {
      * @return Mono<Void> when delete by Id
      */
     Mono<Void> deleteById(String id);
+
+    /**
+     * @param id Client
+     * @return Mono<Void> when delete by Id
+     */
+    Flux<BalanceResponse> getAllProducts(String id);
 }

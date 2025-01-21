@@ -138,6 +138,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /v1/clients/{id_client}/getAllProducts:
+    get:
+      summary: Get all products by Id client
+      operationId: getAllProductsByIdClient
+      parameters:
+        - name: id_client
+          in: path
+          required: true
+          description: Id client
+          schema:
+            type: string
+      responses:
+          '200':
+            description: Get all products by Id client
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/BalanceResponse'
+          '400':
+            description: Request invalid
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '500':
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas: 
@@ -156,6 +188,15 @@ components:
       enum:
         - VIP
         - PYME
+    ProductType:
+      type: string
+      enum:
+        - ACCOUNT_SAVING
+        - ACCOUNT_CURRENT
+        - ACCOUNT_FIXED_TERM
+        - CREDIT_PERSONAL
+        - CREDIT_BUSINESS
+        - CREDIT_CARD
     Client:
       type: object
       properties:
@@ -215,11 +256,16 @@ components:
           type: string
         message:
           type: string
-    ApiResponse:
+    BalanceResponse:
       type: object
-      properties: 
-        success:
-          type: boolean
-        message:
+      properties:
+        productId:
           type: string
+        type:
+          $ref: '#/components/schemas/ProductType'
+        nroAccount:
+          type: string
+        balanceAccount:
+          type: number
+
           
